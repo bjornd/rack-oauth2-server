@@ -18,10 +18,10 @@ module Rack
           #
           # You can set optional expiration in seconds. If zero or nil, token
           # never expires.
-          def get_token_for(identity, client, scope, expires = nil)
+          def get_token_for(identity, client, scope, expires = nil, force_new = false)
             raise ArgumentError, "Identity must be String or Integer" unless String === identity || Integer === identity
             scope = Utils.normalize_scope(scope) & client.scope # Only allowed scope
-            unless token = collection.find_one({ :identity=>identity, :scope=>scope, :client_id=>client.id, :revoked=>nil })
+            unless token = collection.find_one({ :identity=>identity, :scope=>scope, :client_id=>client.id, :revoked=>nil }) || force_new
               expires_at = Time.now.to_i + expires if expires && expires != 0
               token = { :_id=>Server.secure_random, :identity=>identity, :scope=>scope,
                         :client_id=>client.id, :created_at=>Time.now.to_i,

@@ -106,9 +106,9 @@ module Rack
         # @param [Integer, nil] expires How many seconds before access token
         # expires, defaults to never. If zero or nil, token never expires.
         # @return [String] Access token
-        def token_for(identity, client_id, scope = nil, expires_in = nil)
+        def token_for(identity, client_id, scope = nil, expires_in = nil, force_new = false)
           client = get_client(client_id) or fail "No such client"
-          AccessToken.get_token_for(identity, client, scope || client.scope, expires_in).token
+          AccessToken.get_token_for(identity, client, scope || client.scope, expires_in, force_new).token
         end
 
         # Returns all AccessTokens for an identity.
@@ -154,7 +154,7 @@ module Rack
       #     user if user && user.authenticated?(password)
       #   end
       Options = Struct.new(:access_token_path, :authenticator, :authorization_types,
-        :authorize_path, :database, :host, :param_authentication, :path, :realm, 
+        :authorize_path, :database, :host, :param_authentication, :path, :realm,
         :expires_in,:logger, :collection_prefix)
 
       # Global options. This is what we set during configuration (e.g. Rails'
@@ -392,7 +392,7 @@ module Rack
         rescue OAuthError=>error
           logger.error "RO2S: Access token request error #{error.code}: #{error.message}" if logger
           return unauthorized(request, error) if InvalidClientError === error && request.basic?
-          return [400, { "Content-Type"=>"application/json", "Cache-Control"=>"no-store" }, 
+          return [400, { "Content-Type"=>"application/json", "Cache-Control"=>"no-store" },
                   [{ :error=>error.code, :error_description=>error.message }.to_json]]
         end
       end
