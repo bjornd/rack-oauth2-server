@@ -91,9 +91,10 @@ module Rack
         # Returns AccessToken from token.
         #
         # @param [String] token Access token (e.g. from oauth.access_token)
+        # @param [Boolean] including_revoked True to search for revoked token too
         # @return [AccessToken]
-        def get_access_token(token)
-          AccessToken.from_token(token)
+        def get_access_token(token, including_revoked = false)
+          AccessToken.from_token(token, including_revoked)
         end
 
         # Returns AccessToken for the specified identity, client application and
