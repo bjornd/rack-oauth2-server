@@ -12,7 +12,7 @@ module Rack
           # Find AccessToken from token. Does not return revoked tokens.
           def from_token(token, including_revoked = false)
             filter = { :_id=>token }
-            filter[:revoked] = nil unless include_revoked
+            filter[:revoked] = nil unless including_revoked
 
             Server.new_instance self, collection.find_one(filter)
           end
